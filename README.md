@@ -33,11 +33,11 @@ Tienda en línea que ofrece:
 
 ```bash
 # 1. Clona el repositorio
-git clone https://github.com/TU_USUARIO/bordados-personalizados.git
-cd bordados-personalizados
+git clone https://github.com/Jeff07K/Bordados_project.git
+cd Bordados_project
 
 # 2. Crea el entorno virtual
-python -m venv .venv
+python3.12 -m venv .venv
 source .venv/bin/activate   # Mac/Linux
 .venv\Scripts\activate      # Windows
 
@@ -57,4 +57,4 @@ Ver tabla completa en [GUIA_MAESTRA.md](GUIA_MAESTRA.md)
 
 ## 👤 Autor
 
-**Tu Nombre Completo** — Código: XXXXXXXX
+JEFFREY BEJARANO — Código: 67001609
