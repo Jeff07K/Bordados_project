@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bordados Personalizados</title>
+  <link rel="stylesheet" href="/static/css/styles.css">
+  <script src="https://js.stripe.com/v3/"></script>
+</head>
+<body>
+
+<!-- ── NAVBAR ───────────────────────────────────────────────────────────── -->
+<nav id="navbar">
+  <div class="nav-brand">🧵 Bordados</div>
+  <div class="nav-links">
+    <a href="#catalogo">Catálogo</a>
+    <a href="#personalizado">Pedido personalizado</a>
+  </div>
+  <div class="nav-actions">
+    <button class="btn-ghost" id="btn-auth">Iniciar sesión</button>
+    <button class="btn-cart" id="btn-cart">
+      🛒 <span id="cart-count" class="cart-badge hidden">0</span>
+    </button>
+  </div>
+</nav>
+
+<!-- ── HERO ─────────────────────────────────────────────────────────────── -->
+<section id="hero">
+  <div class="hero-content">
+    <span class="hero-tag">Hecho a mano con amor</span>
+    <h1>Bordados que cuentan<br>tu historia</h1>
+    <p>Prendas únicas, diseños personalizados y catálogo de bordados artesanales.</p>
+    <div class="hero-btns">
+      <a href="#catalogo" class="btn-primary">Ver catálogo</a>
+      <a href="#personalizado" class="btn-outline">Pedir personalizado</a>
+    </div>
+  </div>
+  <div class="hero-art">
+    <div class="embroidery-circle">
+      <span class="ec-icon">🌸</span>
+      <div class="ec-ring ec-ring-1"></div>
+      <div class="ec-ring ec-ring-2"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ── CATÁLOGO ──────────────────────────────────────────────────────────── -->
+<section id="catalogo">
+  <div class="section-header">
+    <h2>Nuestro Catálogo</h2>
+    <p>Bordados artesanales y camisetas disponibles para envío inmediato</p>
+  </div>
+  <div class="filter-bar">
+    <button class="filter-btn active" data-filter="all">Todos</button>
+    <button class="filter-btn" data-filter="bordado">Bordados</button>
+    <button class="filter-btn" data-filter="camiseta">Camisetas</button>
+  </div>
+  <div id="productos-grid" class="products-grid">
+    <div class="skeleton-card"></div>
+    <div class="skeleton-card"></div>
+    <div class="skeleton-card"></div>
+  </div>
+  <p id="catalogo-empty" class="empty-msg hidden">
+    No hay productos aún.
+    <a href="/docs" target="_blank">Agrega uno desde /docs</a>
+  </p>
+</section>
+
+<!-- ── PEDIDO PERSONALIZADO ──────────────────────────────────────────────── -->
+<section id="personalizado">
+  <div class="two-col">
+    <div class="col-info">
+      <h2>Pedido<br>Personalizado</h2>
+      <p>¿Tienes en mente un diseño único? Cuéntanos y lo hacemos realidad. Plazo de entrega: 7–14 días hábiles.</p>
+      <ul class="benefits">
+        <li>✔ Diseño exclusivo para ti</li>
+        <li>✔ Talla a tu medida</li>
+        <li>✔ Eliges el color de hilo</li>
+        <li>✔ Envío a toda Colombia</li>
+      </ul>
+    </div>
+    <form id="form-pedido" class="card-form" novalidate>
+      <div class="form-group">
+        <label>Tu correo electrónico *</label>
+        <input type="email" id="p-email" placeholder="nombre@correo.com" required>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Talla</label>
+          <select id="p-talla">
+            <option value="">Selecciona</option>
+            <option>XS</option><option>S</option><option>M</option>
+            <option>L</option><option>XL</option><option>XXL</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Color de hilo</label>
+          <input type="text" id="p-color" placeholder="Ej: azul marino">
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Describe tu diseño *</label>
+        <textarea id="p-descripcion" rows="4" placeholder="Cuéntanos qué quieres bordar, en qué prenda, detalles importantes..." required></textarea>
+      </div>
+      <div class="form-group">
+        <label>Presupuesto estimado (USD)</label>
+        <input type="number" id="p-precio" placeholder="Ej: 25.00" min="5" step="0.01">
+      </div>
+      <button type="submit" class="btn-primary full-width">Enviar solicitud</button>
+    </form>
+  </div>
+</section>
+
+<!-- ── FOOTER ────────────────────────────────────────────────────────────── -->
+<footer>
+  <div class="footer-inner">
+    <div>
+      <strong>🧵 Bordados Personalizados</strong>
+      <p>Colombia · Envíos nacionales</p>
+    </div>
+    <div>
+      <p>Devoluciones según <strong>Ley 1480 de 2011</strong><br>Retracto: hasta 5 días hábiles.</p>
+    </div>
+    <div>
+      <a href="/docs" target="_blank">API Docs</a>
+    </div>
+  </div>
+</footer>
+
+<!-- ══ MODAL AUTH ════════════════════════════════════════════════════════════ -->
+<div id="modal-auth" class="modal hidden" role="dialog" aria-modal="true">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeModal('modal-auth')">✕</button>
+    <div class="tab-bar">
+      <button class="tab active" id="tab-login" onclick="switchTab('login')">Iniciar sesión</button>
+      <button class="tab" id="tab-register" onclick="switchTab('register')">Registrarse</button>
+    </div>
+
+    <!-- Login -->
+    <form id="form-login" class="auth-form" novalidate>
+      <div class="form-group">
+        <label>Correo</label>
+        <input type="email" id="l-email" placeholder="nombre@correo.com" required>
+      </div>
+      <div class="form-group">
+        <label>Contraseña</label>
+        <input type="password" id="l-pass" placeholder="••••••••" required>
+      </div>
+      <button type="submit" class="btn-primary full-width">Entrar</button>
+    </form>
+
+    <!-- Register -->
+    <form id="form-register" class="auth-form hidden" novalidate>
+      <div class="form-group">
+        <label>Nombre completo</label>
+        <input type="text" id="r-nombre" placeholder="Tu nombre" required>
+      </div>
+      <div class="form-group">
+        <label>Correo</label>
+        <input type="email" id="r-email" placeholder="nombre@correo.com" required>
+      </div>
+      <div class="form-group">
+        <label>Dirección de envío</label>
+        <input type="text" id="r-dir" placeholder="Calle, ciudad, departamento">
+      </div>
+      <div class="form-group">
+        <label>Contraseña</label>
+        <input type="password" id="r-pass" placeholder="••••••••" required>
+      </div>
+      <button type="submit" class="btn-primary full-width">Crear cuenta</button>
+    </form>
+  </div>
+</div>
+
+<!-- ══ MODAL CHECKOUT ════════════════════════════════════════════════════════ -->
+<div id="modal-checkout" class="modal hidden" role="dialog" aria-modal="true">
+  <div class="modal-box modal-checkout-box">
+    <button class="modal-close" onclick="closeModal('modal-checkout')">✕</button>
+    <h3>Resumen del pedido</h3>
+
+    <div id="checkout-items" class="checkout-items"></div>
+
+    <div class="checkout-total">
+      Total: <strong id="checkout-total-val">$0.00</strong>
+    </div>
+
+    <div class="divider"></div>
+
+    <h4>Datos de pago</h4>
+    <div class="form-group">
+      <label>Nombre en la tarjeta</label>
+      <input type="text" id="card-name" placeholder="Como aparece en la tarjeta">
+    </div>
+
+    <!-- Stripe Card Element -->
+    <div class="form-group">
+      <label>Tarjeta de crédito / débito</label>
+      <div id="stripe-card-element" class="stripe-element"></div>
+      <p id="card-error" class="field-error hidden"></p>
+    </div>
+
+    <p class="stripe-note">🔒 Pago seguro procesado por <strong>Stripe</strong></p>
+    <p class="stripe-note test-note">🧪 Modo prueba — usa tarjeta <code>4242 4242 4242 4242</code>, cualquier fecha futura y CVC</p>
+
+    <button id="btn-pagar" class="btn-primary full-width" onclick="procesarPago()">
+      Pagar <span id="btn-pagar-monto"></span>
+    </button>
+  </div>
+</div>
+
+<!-- ── CARRITO (drawer) ──────────────────────────────────────────────────── -->
+<div id="cart-drawer" class="cart-drawer hidden">
+  <div class="cart-header">
+    <h3>Tu carrito</h3>
+    <button class="btn-ghost" onclick="closeCart()">✕</button>
+  </div>
+  <div id="cart-items" class="cart-items"></div>
+  <div class="cart-footer">
+    <p>Total: <strong id="cart-total">$0.00</strong></p>
+    <button class="btn-primary full-width" onclick="abrirCheckout()">Proceder al pago</button>
+  </div>
+</div>
+
+<!-- Overlay -->
+<div id="overlay" class="overlay hidden" onclick="closeAll()"></div>
+
+<!-- Toast -->
+<div id="toast" class="toast hidden"></div>
+
+<script src="/static/js/app.js"></script>
+</body>
+</html>
