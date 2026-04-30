@@ -51,9 +51,6 @@ uvicorn main:app --reload
 
 Visita `http://127.0.0.1:8000/docs` para ver la documentación de la API.
 
-## 📋 Endpoints principales
-
-Ver tabla completa en [GUIA_MAESTRA.md](GUIA_MAESTRA.md)
 
 ## 👤 Autor
 
