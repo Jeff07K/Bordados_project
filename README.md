@@ -50,12 +50,12 @@ pip install -r requirements.txt
 
 # 4. Crea el archivo .env (copia el .env.example)
 # 5. Ejecuta
-uvicorn main:app --reload
+uvicorn main:app --reload --port 8001
 ```
 
-Visita `http://127.0.0.1:8000/docs` para ver la documentación de la API.
+Visita `http://127.0.0.1:8001/docs` para ver la documentación de la API.
 
 
 ## 👤 Autor
 
-JEFFREY BEJARANO — Código: 67001609
+JEFFREY BEJARANO 
