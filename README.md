@@ -22,8 +22,8 @@ Tienda en línea que ofrece:
 
 ## ⚙️ Tecnologías
 
-- Python 3.11
-- FastAPI 0.135
+- Python 3.12 o superior
+- FastAPI 
 - SQLModel / Pydantic
 - Persistencia: CSV
 - Stripe (pagos reales)
