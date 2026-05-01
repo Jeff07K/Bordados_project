@@ -32,10 +32,10 @@ async def lifespan(app: FastAPI):
 app = FastAPI(
     title="Bordados Personalizados API",
     description="""
-## API de Bordados Personalizados — v1 CSV
-Proyecto Integrador · FastAPI · CRUD sobre CSV
+## API de Bordados Personalizados — v1.8 CSV
+Proyecto Integrador 
 
-### Modelos
+### Modelos (los 3 solicita la encuesta :3)
 - **Usuario** — clientes de la tienda
 - **Producto** — bordados y camisetas del catálogo
 - **PedidoPersonalizado** — solicitudes personalizadas
@@ -86,12 +86,12 @@ async def create_usuario(data: UsuarioCreate):
 
 @app.get("/usuario", tags=["Usuario"])
 async def find_all_usuarios(solo_activos: bool = Query(False, description="Mostrar solo usuarios activos")):
-    """Retorna todos los usuarios. Con ?solo_activos=true filtra los inactivos."""
+    """Retorna todos los usuarios"""
     return findAllUsuarios(solo_activos)
 
 @app.get("/usuario/buscar", tags=["Usuario"])
 async def buscar_usuario_por_email(email: str = Query(..., description="Email del usuario a buscar")):
-    """CRITERIO 7 — Búsqueda por atributo ≠ ID: busca usuario por email."""
+    """Búsqca por atributo, no es lo mismo que ID: busca usuario por email."""
     resultado = findUsuarioByEmail(email)
     if not resultado:
         raise HTTPException(status_code=404, detail=f"No se encontró usuario con email: {email}")
@@ -113,7 +113,7 @@ async def update_usuario(usuario_id: int, data: UsuarioUpdate):
 
 @app.delete("/usuario/{usuario_id}", tags=["Usuario"])
 async def kill_usuario(usuario_id: int):
-    """CRITERIO 5 — Soft delete: el usuario se marca como inactivo, no se elimina."""
+    """" Estado de usuario , activo o no  """
     d = killUsuario(usuario_id)
     if not d:
         raise HTTPException(status_code=404, detail=f"{usuario_id} Usuario no encontrado")
@@ -133,7 +133,7 @@ async def find_all_productos(solo_activos: bool = Query(False)):
 
 @app.get("/producto/filtrar/categoria", tags=["Producto"])
 async def filtrar_productos_por_categoria(categoria: str = Query(..., description="Ej: bordado, camiseta")):
-    """CRITERIO 6 — Filtro por categoría: retorna listado filtrado."""
+    """istado filtrado."""
     resultado = findProductosByCategoria(categoria)
     if not resultado:
         raise HTTPException(status_code=404, detail=f"No hay productos con categoría: {categoria}")
@@ -141,7 +141,7 @@ async def filtrar_productos_por_categoria(categoria: str = Query(..., descriptio
 
 @app.get("/producto/buscar/nombre", tags=["Producto"])
 async def buscar_producto_por_nombre(nombre: str = Query(..., description="Nombre o parte del nombre")):
-    """CRITERIO 7 — Búsqueda por nombre (atributo ≠ ID)."""
+    """Búsqca por atributo, no es lo mismo que ID:"""
     resultado = findProductosByNombre(nombre)
     if not resultado:
         raise HTTPException(status_code=404, detail=f"No se encontraron productos con nombre: {nombre}")
