@@ -1,6 +1,6 @@
 # 🧵 Bordados Personalizados
 
-**Proyecto Integrador — FastAPI · CRUD · CSV · 2026-1**
+**Proyecto Integrador**
 
 Plataforma web para la gestión y venta de bordados artesanales personalizados.
 
@@ -36,10 +36,14 @@ Tienda en línea que ofrece:
 git clone https://github.com/Jeff07K/Bordados_project.git
 cd Bordados_project
 
-# 2. Crea el entorno virtual
+# 2. Crea el entorno virtual (recominedo la version 3.12 de python)
 python3.12 -m venv .venv
 source .venv/bin/activate   # Mac/Linux
 .venv\Scripts\activate      # Windows
+
+# 2.5. Instalar los paquetes
+pip install "fastapi[standard]"
+pip install sqlmodel
 
 # 3. Instala dependencias
 pip install -r requirements.txt
