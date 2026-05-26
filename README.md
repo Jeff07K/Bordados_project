@@ -1,13 +1,7 @@
 # 🧵 Bordados Personalizados — v2.0
 
-Tienda online de bordados artesanales con sistema de pedidos personalizados.
+Tienda online de bordados pedidos personalizados.
 
-## ✨ Novedades v2.0
-
-- **SQLite** local → **Supabase / Neon** en producción (solo cambiar `DATABASE_URL`)
-- **Autenticación JWT** con roles usuario/admin
-- **4 páginas HTML** separadas con CSS y JS propios
-- API organizada en **routers** por módulo
 
 ## 🗂️ Estructura
 
