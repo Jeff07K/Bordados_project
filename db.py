@@ -1,24 +1,33 @@
-import csv
+"""
+db.py — Conexión flexible:
+  - LOCAL:       SQLite  (DATABASE_URL no definida o sqlite:///)
+  - PRODUCCIÓN:  Supabase PostgreSQL o Neon PostgreSQL
+                 (poner en .env: DATABASE_URL=postgresql://...)
+"""
 import os
+from sqlmodel import SQLModel, create_engine, Session
+from dotenv import load_dotenv
 
-USUARIOS_CSV  = "usuarios.csv"
-PRODUCTOS_CSV = "productos.csv"
-PEDIDOS_CSV   = "pedidos_personalizados.csv"
+load_dotenv()
 
-USUARIOS_FIELDS  = ["id", "nombre_real", "email", "direccion_envio", "contrasena", "activo"]
-PRODUCTOS_FIELDS = ["id", "nombre", "descripcion", "precio", "categoria", "stock", "activo"]
-PEDIDOS_FIELDS   = ["id", "usuario_email", "producto_id", "descripcion",
-                    "talla", "color", "precio_estimado", "estado"]
+DATABASE_URL = os.environ.get("DATABASE_URL", "sqlite:///./bordados.db")
 
+# Neon / Supabase usan "postgres://" pero SQLAlchemy necesita "postgresql://"
+if DATABASE_URL.startswith("postgres://"):
+    DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://", 1)
 
-def _init_csv(filepath: str, fields: list[str]) -> None:
-    if not os.path.exists(filepath):
-        with open(filepath, "w", newline="", encoding="utf-8") as f:
-            writer = csv.DictWriter(f, fieldnames=fields)
-            writer.writeheader()
+# SQLite necesita connect_args especial; PostgreSQL no
+connect_args = {"check_same_thread": False} if DATABASE_URL.startswith("sqlite") else {}
+
+engine = create_engine(DATABASE_URL, echo=False, connect_args=connect_args)
 
 
-def init_all_csv() -> None:
-    _init_csv(USUARIOS_CSV,  USUARIOS_FIELDS)
-    _init_csv(PRODUCTOS_CSV, PRODUCTOS_FIELDS)
-    _init_csv(PEDIDOS_CSV,   PEDIDOS_FIELDS)
+def init_db():
+    """Crea todas las tablas si no existen."""
+    SQLModel.metadata.create_all(engine)
+
+
+def get_session():
+    """Dependency de FastAPI para inyectar sesión."""
+    with Session(engine) as session:
+        yield session

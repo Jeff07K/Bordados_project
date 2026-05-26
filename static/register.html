@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Crear cuenta — Bordados</title>
+  <link rel="stylesheet" href="/static/css/main.css" />
+  <style>
+    body { background: var(--dark-brown); min-height:100vh; display:flex; align-items:center; justify-content:center; padding:1rem; }
+    .auth-card {
+      background: var(--warm-white);
+      border-radius: var(--radius-lg);
+      padding: 2.5rem 2rem;
+      width: 100%;
+      max-width: 460px;
+      box-shadow: var(--shadow-lg);
+    }
+    .auth-logo { text-align:center; margin-bottom:2rem; }
+    .auth-logo a { font-family:var(--font-display); font-size:2rem; font-weight:700; color:var(--dark-brown); text-decoration:none; }
+    .auth-logo span { color:var(--terracotta); }
+    .auth-logo p { color:var(--text-muted); font-size:0.9rem; margin-top:0.25rem; }
+    .two-col { display:grid; grid-template-columns:1fr 1fr; gap:1rem; }
+    .auth-footer { text-align:center; margin-top:1.5rem; font-size:0.88rem; color:var(--text-muted); }
+    .auth-footer a { color:var(--terracotta); font-weight:500; text-decoration:none; }
+    @media(max-width:480px) { .two-col { grid-template-columns:1fr; } }
+  </style>
+</head>
+<body>
+  <div class="auth-card">
+    <div class="auth-logo">
+      <a href="/">🧵 Bordados <span>Personalizados</span></a>
+      <p>Crea tu cuenta gratis</p>
+    </div>
+
+    <div class="alert alert-error" id="error-msg"></div>
+    <div class="alert alert-success" id="ok-msg"></div>
+
+    <div class="form-group">
+      <label>Nombre completo</label>
+      <input type="text" id="nombre" placeholder="Tu nombre" autocomplete="name" />
+    </div>
+    <div class="form-group">
+      <label>Correo electrónico</label>
+      <input type="email" id="email" placeholder="tu@correo.com" autocomplete="email" />
+    </div>
+    <div class="form-group">
+      <label>Dirección de envío <span style="font-weight:400;text-transform:none;letter-spacing:0">(opcional)</span></label>
+      <input type="text" id="direccion" placeholder="Calle, ciudad, país" autocomplete="street-address" />
+    </div>
+    <div class="two-col">
+      <div class="form-group">
+        <label>Contraseña</label>
+        <input type="password" id="pass1" placeholder="Mínimo 6 caracteres" />
+      </div>
+      <div class="form-group">
+        <label>Confirmar</label>
+        <input type="password" id="pass2" placeholder="Repite la contraseña" />
+      </div>
+    </div>
+
+    <button class="btn btn-primary btn-full" id="register-btn" onclick="doRegister()">
+      Crear cuenta
+    </button>
+
+    <div class="auth-footer">
+      ¿Ya tienes cuenta? <a href="/login">Inicia sesión</a>
+      &nbsp;·&nbsp; <a href="/">← Catálogo</a>
+    </div>
+  </div>
+
+<script src="/static/js/api.js"></script>
+<script>
+  if (Api.isLoggedIn()) window.location.href = '/dashboard';
+
+  async function doRegister() {
+    const nombre    = document.getElementById('nombre').value.trim();
+    const email     = document.getElementById('email').value.trim();
+    const direccion = document.getElementById('direccion').value.trim();
+    const pass1     = document.getElementById('pass1').value;
+    const pass2     = document.getElementById('pass2').value;
+    const errEl     = document.getElementById('error-msg');
+    const okEl      = document.getElementById('ok-msg');
+    const btn       = document.getElementById('register-btn');
+
+    errEl.classList.remove('show');
+    okEl.classList.remove('show');
+
+    if (!nombre || !email || !pass1) {
+      errEl.textContent = 'Nombre, email y contraseña son obligatorios.';
+      errEl.classList.add('show'); return;
+    }
+    if (pass1.length < 6) {
+      errEl.textContent = 'La contraseña debe tener al menos 6 caracteres.';
+      errEl.classList.add('show'); return;
+    }
+    if (pass1 !== pass2) {
+      errEl.textContent = 'Las contraseñas no coinciden.';
+      errEl.classList.add('show'); return;
+    }
+
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner"></span> Creando cuenta...';
+
+    try {
+      await Api.register({ nombre_real: nombre, email, direccion_envio: direccion || null, contrasena: pass1 });
+      okEl.textContent = '¡Cuenta creada! Redirigiendo al login...';
+      okEl.classList.add('show');
+      setTimeout(() => window.location.href = '/login', 1800);
+    } catch (e) {
+      errEl.textContent = e.message;
+      errEl.classList.add('show');
+      btn.disabled = false;
+      btn.textContent = 'Crear cuenta';
+    }
+  }
+</script>
+</body>
+</html>

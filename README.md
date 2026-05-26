@@ -1,61 +1,38 @@
-# 🧵 Bordados Personalizados
+# 🧵 Bordados Personalizados — v2.0
 
-**Proyecto Integrador**
+Tienda online de bordados artesanales con sistema de pedidos personalizados.
 
-Plataforma web para la gestión y venta de bordados artesanales personalizados.
+## ✨ Novedades v2.0
 
-## 🎯 Descripción del proyecto
+- **SQLite** local → **Supabase / Neon** en producción (solo cambiar `DATABASE_URL`)
+- **Autenticación JWT** con roles usuario/admin
+- **4 páginas HTML** separadas con CSS y JS propios
+- API organizada en **routers** por módulo
 
-Tienda en línea que ofrece:
-- Catálogo de bordados y camisetas con bordado
-- Sistema de pedidos personalizados
-- Registro y autenticación de usuarios
-- Pago con tarjeta (integración Stripe)
+## 🗂️ Estructura
 
-## 🗂️ Modelos de datos
-
-| Modelo | Descripción |
-|--------|-------------|
-| `Usuario` | Clientes: nombre, email, dirección, contraseña, activo |
-| `Producto` | Artículos del catálogo: nombre, precio, categoría, stock, activo |
-| `PedidoPersonalizado` | Solicitudes: descripción, talla, color, precio estimado, estado |
-
-## ⚙️ Tecnologías
-
-- Python 3.12 o superior
-- FastAPI 
-- SQLModel / Pydantic
-- Persistencia: CSV
-- Stripe (pagos reales)
-- Desplegado en Render
-
-## 🚀 Cómo ejecutar localmente
-
-```bash
-# 1. Clona el repositorio
-git clone https://github.com/Jeff07K/Bordados_project.git
-cd Bordados_project
-
-# 2. Crea el entorno virtual (recominedo la version 3.12 de python)
-python3.12 -m venv .venv
-source .venv/bin/activate   # Mac/Linux
-.venv\Scripts\activate      # Windows
-
-# 2.5. Instalar los paquetes
-pip install "fastapi[standard]"
-pip install sqlmodel
-
-# 3. Instala dependencias
-pip install -r requirements.txt
-
-# 4. Crea el archivo .env (copia el .env.example)
-# 5. Ejecuta
-uvicorn main:app --reload --port 8001
 ```
-
-Visita `http://127.0.0.1:8001/docs` para ver la documentación de la API.
+Bordados_project/
+├── main.py              ← FastAPI app + rutas de páginas
+├── db.py                ← Conexión SQLite / Supabase / Neon
+├── models.py            ← Modelos SQLModel
+├── auth.py              ← JWT + hashing
+├── routers/
+│   ├── auth_router.py   ← POST /auth/register, /auth/login
+│   ├── productos.py     ← CRUD /producto/
+│   ├── pedidos.py       ← CRUD /pedido/
+│   └── usuarios.py      ← CRUD /usuario/
+└── static/
+    ├── index.html       ← Catálogo público
+    ├── login.html       ← Inicio de sesión
+    ← register.html     ← Registro
+    ├── dashboard.html   ← Panel del usuario
+    ├── admin.html       ← Panel administrador
+    ├── css/main.css     ← Estilos globales
+    └── js/api.js        ← Capa de llamadas a la API
+```
 
 
 ## 👤 Autor
 
-JEFFREY BEJARANO 
+Jeffrey Bejarano

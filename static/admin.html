@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Panel Admin — Bordados</title>
+  <link rel="stylesheet" href="/static/css/main.css" />
+  <style>
+    .admin-layout { display:grid; grid-template-columns:220px 1fr; gap:2rem; align-items:start; }
+    .sidebar {
+      background:var(--dark-brown);
+      border-radius:var(--radius-lg);
+      overflow:hidden;
+      position:sticky; top:80px;
+    }
+    .sidebar-brand { padding:1.5rem; border-bottom:1px solid rgba(255,255,255,0.1); }
+    .sidebar-brand p { font-family:var(--font-display); font-size:1.1rem; color:var(--cream); font-weight:600; }
+    .sidebar-brand small { color:var(--taupe); font-size:0.78rem; }
+    .sidebar-nav { padding:0.75rem 0; }
+    .sidebar-link {
+      display:flex; align-items:center; gap:0.7rem;
+      padding:0.75rem 1.25rem; font-size:0.88rem;
+      color:var(--taupe); cursor:pointer;
+      transition:all var(--transition);
+      border-left:3px solid transparent;
+    }
+    .sidebar-link:hover, .sidebar-link.active {
+      color:var(--cream); background:rgba(255,255,255,0.08);
+      border-left-color:var(--terracotta-light);
+    }
+    .stats-row { display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:1rem; margin-bottom:2rem; }
+    .stat-card {
+      background:var(--warm-white); border:1px solid var(--border);
+      border-radius:var(--radius-lg); padding:1.25rem;
+      text-align:center;
+    }
+    .stat-number { font-family:var(--font-display); font-size:2.2rem; font-weight:700; color:var(--terracotta); }
+    .stat-label { font-size:0.8rem; color:var(--text-muted); margin-top:0.25rem; }
+    .tab-panel { display:none; }
+    .tab-panel.active { display:block; }
+    .estado-badge { padding:0.25rem 0.75rem; border-radius:999px; font-size:0.75rem; font-weight:500; }
+    .estado-pendiente   { background:#FFF3D0; color:#8A6A00; }
+    .estado-en_proceso  { background:#D5E8FF; color:#1A4A8A; }
+    .estado-pagado      { background:#D5EDD5; color:#2D7A2D; }
+    .estado-cancelado   { background:#FFDDD5; color:#8B2500; }
+    .modal-overlay { display:none; position:fixed; inset:0; background:rgba(30,15,5,0.55); z-index:200; align-items:center; justify-content:center; padding:1rem; }
+    .modal-overlay.open { display:flex; }
+    @media(max-width:768px) { .admin-layout { grid-template-columns:1fr; } .sidebar { position:static; } }
+  </style>
+</head>
+<body>
+
+<nav class="navbar">
+  <a href="/" class="navbar-brand">🧵 Bordados <span>Personalizados</span></a>
+  <ul class="nav-links">
+    <li><a href="/">Catálogo</a></li>
+    <li><a href="/dashboard">Mi cuenta</a></li>
+    <li><a href="/admin" class="active">Admin</a></li>
+    <li><button class="btn btn-nav" onclick="Api.logout()">Salir</button></li>
+  </ul>
+</nav>
+
+<div class="container">
+  <div class="admin-layout">
+
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-brand">
+        <p>⚙️ Panel Admin</p>
+        <small id="admin-nombre">Administrador</small>
+      </div>
+      <nav class="sidebar-nav">
+        <div class="sidebar-link active" onclick="showTab('resumen')">📊 Resumen</div>
+        <div class="sidebar-link" onclick="showTab('productos')">🧵 Productos</div>
+        <div class="sidebar-link" onclick="showTab('pedidos')">📦 Pedidos</div>
+        <div class="sidebar-link" onclick="showTab('usuarios')">👥 Usuarios</div>
+        <div class="sidebar-link" onclick="Api.logout()" style="margin-top:1rem; color:#F5A090">🚪 Salir</div>
+      </nav>
+    </aside>
+
+    <!-- Main -->
+    <main>
+
+      <!-- Tab: Resumen -->
+      <div class="tab-panel active" id="tab-resumen">
+        <h2 class="section-title">Resumen</h2>
+        <p class="section-subtitle" style="margin-bottom:1.5rem">Vista general del negocio</p>
+        <div class="stats-row">
+          <div class="stat-card"><div class="stat-number" id="stat-productos">—</div><div class="stat-label">Productos activos</div></div>
+          <div class="stat-card"><div class="stat-number" id="stat-pedidos">—</div><div class="stat-label">Pedidos totales</div></div>
+          <div class="stat-card"><div class="stat-number" id="stat-usuarios">—</div><div class="stat-label">Usuarios</div></div>
+          <div class="stat-card"><div class="stat-number" id="stat-pendientes">—</div><div class="stat-label">Pedidos pendientes</div></div>
+        </div>
+        <div class="card" style="border-radius:var(--radius-lg)">
+          <div class="card-body">
+            <p style="color:var(--text-muted); font-size:0.9rem">
+              💡 <strong>Acceso rápido:</strong> usa el menú lateral para gestionar productos, 
+              actualizar estados de pedidos y administrar usuarios.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab: Productos -->
+      <div class="tab-panel" id="tab-productos">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem">
+          <div>
+            <h2 class="section-title">Productos</h2>
+            <p class="section-subtitle">Gestiona el catálogo</p>
+          </div>
+          <button class="btn btn-primary btn-sm" onclick="abrirModalProducto()">+ Nuevo producto</button>
+        </div>
+        <div class="loading-state" id="prod-loading"><div class="spinner"></div></div>
+        <div class="table-wrap" id="prod-table" style="display:none">
+          <table>
+            <thead><tr><th>#</th><th>Nombre</th><th>Categoría</th><th>Precio</th><th>Stock</th><th>Estado</th><th>Acciones</th></tr></thead>
+            <tbody id="prod-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Tab: Pedidos -->
+      <div class="tab-panel" id="tab-pedidos">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem">
+          <div>
+            <h2 class="section-title">Pedidos</h2>
+            <p class="section-subtitle">Todos los pedidos personalizados</p>
+          </div>
+          <select id="filtro-estado" onchange="loadPedidos()" class="btn btn-secondary btn-sm" style="width:auto; padding:0.4rem 0.8rem;">
+            <option value="">Todos</option>
+            <option value="pendiente">Pendiente</option>
+            <option value="en_proceso">En proceso</option>
+            <option value="pagado">Pagado</option>
+            <option value="cancelado">Cancelado</option>
+          </select>
+        </div>
+        <div class="loading-state" id="ped-loading"><div class="spinner"></div></div>
+        <div class="table-wrap" id="ped-table" style="display:none">
+          <table>
+            <thead><tr><th>#</th><th>Email</th><th>Descripción</th><th>Precio est.</th><th>Estado</th><th>Cambiar estado</th></tr></thead>
+            <tbody id="ped-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Tab: Usuarios -->
+      <div class="tab-panel" id="tab-usuarios">
+        <h2 class="section-title">Usuarios</h2>
+        <p class="section-subtitle" style="margin-bottom:1.5rem">Lista de todos los usuarios registrados</p>
+        <div class="loading-state" id="usr-loading"><div class="spinner"></div></div>
+        <div class="table-wrap" id="usr-table" style="display:none">
+          <table>
+            <thead><tr><th>#</th><th>Nombre</th><th>Email</th><th>Rol</th><th>Estado</th><th>Acción</th></tr></thead>
+            <tbody id="usr-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+
+    </main>
+  </div>
+</div>
+
+<!-- Modal Producto -->
+<div class="modal-overlay" id="modal-producto">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 class="modal-title" id="modal-prod-title">Nuevo producto</h3>
+      <button class="modal-close" onclick="cerrarModalProd()">✕</button>
+    </div>
+    <div class="alert alert-error" id="prod-error"></div>
+    <input type="hidden" id="prod-edit-id" />
+    <div class="form-group"><label>Nombre</label><input type="text" id="prod-nombre" /></div>
+    <div class="form-group"><label>Descripción</label><textarea id="prod-desc"></textarea></div>
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem">
+      <div class="form-group"><label>Precio ($)</label><input type="number" step="0.01" id="prod-precio" /></div>
+      <div class="form-group"><label>Stock</label><input type="number" id="prod-stock" value="0" /></div>
+    </div>
+    <div class="form-group">
+      <label>Categoría</label>
+      <select id="prod-cat"><option value="bordado">Bordado</option><option value="camiseta">Camiseta</option></select>
+    </div>
+    <div class="form-group"><label>URL imagen (opcional)</label><input type="url" id="prod-img" /></div>
+    <button class="btn btn-primary btn-full" onclick="guardarProducto()">Guardar producto</button>
+  </div>
+</div>
+
+<script src="/static/js/api.js"></script>
+<script>
+  requireAdmin();
+  const user = Api.getUser();
+  document.getElementById('admin-nombre').textContent = user?.nombre || 'Admin';
+
+  function showTab(name) {
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.sidebar-link').forEach(l => l.classList.remove('active'));
+    document.getElementById(`tab-${name}`).classList.add('active');
+    event.target.classList.add('active');
+    if (name === 'resumen') loadResumen();
+    if (name === 'productos') loadProductos();
+    if (name === 'pedidos') loadPedidos();
+    if (name === 'usuarios') loadUsuarios();
+  }
+
+  function estadoBadge(estado) {
+    return `<span class="estado-badge estado-${estado}">${estado.replace('_',' ')}</span>`;
+  }
+
+  async function loadResumen() {
+    try {
+      const [prods, peds, usrs] = await Promise.all([
+        Api.getProductos(true), Api.getAllPedidos(), Api.getUsuarios()
+      ]);
+      document.getElementById('stat-productos').textContent = prods.length;
+      document.getElementById('stat-pedidos').textContent = peds.length;
+      document.getElementById('stat-usuarios').textContent = usrs.length;
+      document.getElementById('stat-pendientes').textContent = peds.filter(p => p.estado === 'pendiente').length;
+    } catch(e) { console.error(e); }
+  }
+
+  async function loadProductos() {
+    document.getElementById('prod-loading').style.display = 'block';
+    document.getElementById('prod-table').style.display = 'none';
+    try {
+      const prods = await Api.getProductos(false);
+      const tbody = document.getElementById('prod-tbody');
+      tbody.innerHTML = prods.map(p => `
+        <tr>
+          <td>${p.id}</td>
+          <td><strong>${p.nombre}</strong></td>
+          <td><span class="badge badge-brown">${p.categoria}</span></td>
+          <td>$${p.precio.toFixed(2)}</td>
+          <td>${p.stock}</td>
+          <td>${p.activo ? '<span class="badge badge-green">Activo</span>' : '<span class="badge badge-red">Inactivo</span>'}</td>
+          <td style="display:flex; gap:0.4rem">
+            <button class="btn btn-secondary btn-sm" onclick="editarProducto(${p.id})">Editar</button>
+            ${p.activo ? `<button class="btn btn-danger btn-sm" onclick="desactivarProd(${p.id})">Desactivar</button>` : ''}
+          </td>
+        </tr>
+      `).join('');
+      document.getElementById('prod-loading').style.display = 'none';
+      document.getElementById('prod-table').style.display = 'block';
+    } catch(e) { console.error(e); }
+  }
+
+  async function loadPedidos() {
+    document.getElementById('ped-loading').style.display = 'block';
+    document.getElementById('ped-table').style.display = 'none';
+    const estado = document.getElementById('filtro-estado').value;
+    try {
+      const peds = await Api.getAllPedidos(estado);
+      const tbody = document.getElementById('ped-tbody');
+      tbody.innerHTML = peds.map(p => `
+        <tr>
+          <td>#${p.id}</td>
+          <td style="font-size:0.82rem">${p.usuario_email}</td>
+          <td style="max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${p.descripcion}">${p.descripcion}</td>
+          <td>${p.precio_estimado ? '$' + p.precio_estimado.toFixed(2) : '—'}</td>
+          <td>${estadoBadge(p.estado)}</td>
+          <td>
+            <select onchange="cambiarEstado(${p.id}, this.value)" class="btn btn-secondary btn-sm" style="width:auto; padding:0.3rem 0.5rem">
+              <option value="">Cambiar...</option>
+              <option value="pendiente">Pendiente</option>
+              <option value="en_proceso">En proceso</option>
+              <option value="pagado">Pagado</option>
+              <option value="cancelado">Cancelado</option>
+            </select>
+          </td>
+        </tr>
+      `).join('');
+      document.getElementById('ped-loading').style.display = 'none';
+      document.getElementById('ped-table').style.display = 'block';
+    } catch(e) { console.error(e); }
+  }
+
+  async function cambiarEstado(id, estado) {
+    if (!estado) return;
+    try { await Api.updatePedido(id, { estado }); loadPedidos(); }
+    catch(e) { alert(e.message); }
+  }
+
+  async function loadUsuarios() {
+    document.getElementById('usr-loading').style.display = 'block';
+    document.getElementById('usr-table').style.display = 'none';
+    try {
+      const usrs = await Api.getUsuarios();
+      const tbody = document.getElementById('usr-tbody');
+      tbody.innerHTML = usrs.map(u => `
+        <tr>
+          <td>${u.id}</td>
+          <td>${u.nombre_real}</td>
+          <td style="font-size:0.82rem">${u.email}</td>
+          <td><span class="badge ${u.rol === 'admin' ? 'badge-terra' : 'badge-brown'}">${u.rol}</span></td>
+          <td>${u.activo ? '<span class="badge badge-green">Activo</span>' : '<span class="badge badge-red">Inactivo</span>'}</td>
+          <td>${u.activo ? `<button class="btn btn-danger btn-sm" onclick="desactivarUser(${u.id})">Desactivar</button>` : '—'}</td>
+        </tr>
+      `).join('');
+      document.getElementById('usr-loading').style.display = 'none';
+      document.getElementById('usr-table').style.display = 'block';
+    } catch(e) { console.error(e); }
+  }
+
+  // ── Modal Producto ─────────────────────────────────────────────
+  let editandoId = null;
+
+  function abrirModalProducto(prod = null) {
+    editandoId = prod?.id || null;
+    document.getElementById('modal-prod-title').textContent = prod ? 'Editar producto' : 'Nuevo producto';
+    document.getElementById('prod-nombre').value = prod?.nombre || '';
+    document.getElementById('prod-desc').value = prod?.descripcion || '';
+    document.getElementById('prod-precio').value = prod?.precio || '';
+    document.getElementById('prod-stock').value = prod?.stock ?? 0;
+    document.getElementById('prod-cat').value = prod?.categoria || 'bordado';
+    document.getElementById('prod-img').value = prod?.imagen_url || '';
+    document.getElementById('prod-error').classList.remove('show');
+    document.getElementById('modal-producto').classList.add('open');
+  }
+
+  async function editarProducto(id) {
+    const prod = await Api.getProducto(id);
+    abrirModalProducto(prod);
+  }
+
+  function cerrarModalProd() {
+    document.getElementById('modal-producto').classList.remove('open');
+  }
+
+  async function guardarProducto() {
+    const errEl = document.getElementById('prod-error');
+    errEl.classList.remove('show');
+    const data = {
+      nombre: document.getElementById('prod-nombre').value.trim(),
+      descripcion: document.getElementById('prod-desc').value.trim(),
+      precio: parseFloat(document.getElementById('prod-precio').value),
+      stock: parseInt(document.getElementById('prod-stock').value),
+      categoria: document.getElementById('prod-cat').value,
+      imagen_url: document.getElementById('prod-img').value || null,
+    };
+    if (!data.nombre || !data.precio) {
+      errEl.textContent = 'Nombre y precio son obligatorios.';
+      errEl.classList.add('show'); return;
+    }
+    try {
+      if (editandoId) await Api.updateProducto(editandoId, data);
+      else await Api.createProducto(data);
+      cerrarModalProd();
+      loadProductos();
+    } catch(e) {
+      errEl.textContent = e.message;
+      errEl.classList.add('show');
+    }
+  }
+
+  async function desactivarProd(id) {
+    if (!confirm('¿Desactivar este producto?')) return;
+    try { await Api.deleteProducto(id); loadProductos(); }
+    catch(e) { alert(e.message); }
+  }
+
+  async function desactivarUser(id) {
+    if (!confirm('¿Desactivar este usuario?')) return;
+    try { await Api.deactivateUser(id); loadUsuarios(); }
+    catch(e) { alert(e.message); }
+  }
+
+  loadResumen();
+</script>
+</body>
+</html>
