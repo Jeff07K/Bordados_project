@@ -1,7 +1,3 @@
-"""
-auth.py — Autenticación JWT + hashing de contraseñas.
-Dependencias: pip install python-jose[cryptography] passlib[bcrypt]
-"""
 import os
 from datetime import datetime, timedelta
 from typing import Optional

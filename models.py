@@ -1,7 +1,3 @@
-"""
-models.py — Modelos SQLModel para SQLite / PostgreSQL (Supabase, Neon).
-Se eliminó la persistencia CSV. Las tablas se crean automáticamente.
-"""
 from typing import Optional
 from sqlmodel import SQLModel, Field
 from datetime import datetime

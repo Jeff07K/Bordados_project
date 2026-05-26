@@ -1,9 +1,3 @@
-"""
-db.py — Conexión flexible:
-  - LOCAL:       SQLite  (DATABASE_URL no definida o sqlite:///)
-  - PRODUCCIÓN:  Supabase PostgreSQL o Neon PostgreSQL
-                 (poner en .env: DATABASE_URL=postgresql://...)
-"""
 import os
 from sqlmodel import SQLModel, create_engine, Session
 from dotenv import load_dotenv

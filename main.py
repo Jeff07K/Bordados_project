@@ -25,24 +25,10 @@ stripe.api_key = os.environ.get("STRIPE_SECRET_KEY", "")
 app = FastAPI(
     title="🧵 Bordados Personalizados API",
     description="""
-## API de Bordados Personalizados — v2.0
-
-### Mejoras v2.0
-- ✅ **SQLite** local (sin configuración)
-- ✅ **Supabase / Neon** en producción (solo cambiar `DATABASE_URL`)
-- ✅ **Autenticación JWT** con roles usuario/admin
-- ✅ **Frontend** separado en 4 páginas
-
 ### Modelos
 - **Usuario** — clientes y administradores
 - **Producto** — catálogo de bordados y camisetas
 - **PedidoPersonalizado** — solicitudes personalizadas con estado
-
-### Deploy en Render
-Variables de entorno necesarias:
-- `DATABASE_URL` — Neon o Supabase PostgreSQL URL
-- `SECRET_KEY` — Clave secreta JWT
-- `STRIPE_SECRET_KEY` / `STRIPE_PUBLISHABLE_KEY`
 """,
     version="2.0.0",
     lifespan=lifespan,
