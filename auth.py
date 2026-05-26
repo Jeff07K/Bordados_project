@@ -1,3 +1,6 @@
+import bcrypt
+if not hasattr(bcrypt, '__about__'):
+    bcrypt.__about__ = type('about', (), {'__version__': bcrypt.__version__})()
 import os
 from datetime import datetime, timedelta
 from typing import Optional
