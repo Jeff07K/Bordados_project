@@ -19,8 +19,8 @@ from routers import auth_router, productos, pedidos, usuarios
 # ==================== LIFESPAN ====================
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    init_db()          # Inicializa las tablas
-    print("✅ Base de datos inicializada correctamente")
+    create_db_and_tables()
+    print("Base de datos inicializada correctamente")
     yield
 
 
