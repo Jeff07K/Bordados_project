@@ -12,7 +12,7 @@ from fastapi.responses import FileResponse
 from fastapi.middleware.cors import CORSMiddleware
 
 # Importar base de datos y routers
-from db import init_db
+from db import create_db_and_tables
 from routers import auth_router, productos, pedidos, usuarios
 
 

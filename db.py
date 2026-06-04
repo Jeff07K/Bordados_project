@@ -1,10 +1,12 @@
+from dotenv import load_dotenv
+load_dotenv()
+
 from sqlmodel import create_engine, SQLModel, Session
 from typing import Generator
 import os
 
 DATABASE_URL = os.environ.get("DATABASE_URL", "")
 
-# connect_args solo necesario para SQLite; para Postgres va vacío
 engine = create_engine(DATABASE_URL, echo=False)
 
 
