@@ -5,7 +5,7 @@ from sqlmodel import Session, select
 
 from db import get_session
 from models import PedidoPersonalizado, PedidoCreate, PedidoUpdate
-from auth import get_current_user, require_admin, Usuario
+from auth import get_current_user, require_admin
 
 router = APIRouter(prefix="/pedido", tags=["Pedido"])
 
