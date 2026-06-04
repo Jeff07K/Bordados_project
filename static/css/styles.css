@@ -331,3 +331,5 @@ footer { background: var(--brown-dk); color: rgba(255,255,255,.75); padding: 40p
   .nav-links { display: none; }
   .cart-drawer { width: 100%; }
 }
+.container { margin-top: 2rem; }
+.dashboard-layout { min-height: 500px; }

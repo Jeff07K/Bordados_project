@@ -7,51 +7,31 @@
   <link rel="shortcut icon" href="https://cdn-icons-png.freepik.com/512/18141/18141316.png"/>
   <link rel="stylesheet" href="/static/css/main.css" />
   <style>
-    .dashboard-layout { display:grid; grid-template-columns:240px 1fr; gap:2rem; align-items:start; }
-    .sidebar {
-      background:var(--warm-white);
-      border:1px solid var(--border);
-      border-radius:var(--radius-lg);
-      overflow:hidden;
-      position:sticky; top:80px;
-    }
+    .dashboard-layout { display:grid; grid-template-columns:240px 1fr; gap:2rem; align-items:start; margin-top:2rem; }
+    .sidebar { background:var(--warm-white); border:1px solid var(--border); border-radius:var(--radius-lg); overflow:hidden; position:sticky; top:80px; }
     .sidebar-user { padding:1.5rem; text-align:center; border-bottom:1px solid var(--border); background:var(--dark-brown); color:var(--cream); }
-    .sidebar-avatar { font-size:3rem; margin-bottom:0.5rem; }
+    .sidebar-avatar { font-size:2.5rem; margin-bottom:0.5rem; }
     .sidebar-name { font-family:var(--font-display); font-size:1.2rem; font-weight:600; }
     .sidebar-email { font-size:0.8rem; opacity:0.6; margin-top:0.2rem; }
     .sidebar-nav { padding:0.75rem 0; }
-    .sidebar-link {
-      display:flex; align-items:center; gap:0.7rem;
-      padding:0.75rem 1.25rem;
-      font-size:0.9rem;
-      color:var(--text-muted);
-      cursor:pointer;
-      transition:all var(--transition);
-      border-left:3px solid transparent;
-    }
-    .sidebar-link:hover, .sidebar-link.active {
-      color:var(--terracotta); background:var(--cream);
-      border-left-color:var(--terracotta);
-    }
+    .sidebar-link { display:flex; align-items:center; gap:0.7rem; padding:0.75rem 1.25rem; font-size:0.9rem; color:var(--text-muted); cursor:pointer; transition:all var(--transition); border-left:3px solid transparent; }
+    .sidebar-link:hover, .sidebar-link.active { color:var(--terracotta); background:var(--cream); border-left-color:var(--terracotta); }
     .tab-panel { display:none; }
     .tab-panel.active { display:block; }
     .estado-badge { padding:0.25rem 0.75rem; border-radius:999px; font-size:0.75rem; font-weight:500; }
-    .estado-pendiente   { background:#FFF3D0; color:#8A6A00; }
-    .estado-en_proceso  { background:#D5E8FF; color:#1A4A8A; }
-    .estado-pagado      { background:#D5EDD5; color:#2D7A2D; }
-    .estado-cancelado   { background:#FFDDD5; color:#8B2500; }
-    @media(max-width:768px) {
-      .dashboard-layout { grid-template-columns:1fr; }
-      .sidebar { position:static; }
-    }
+    .estado-pendiente  { background:#FFF3D0; color:#8A6A00; }
+    .estado-en_proceso { background:#D5E8FF; color:#1A4A8A; }
+    .estado-pagado     { background:#D5EDD5; color:#2D7A2D; }
+    .estado-cancelado  { background:#FFDDD5; color:#8B2500; }
+    @media(max-width:768px) { .dashboard-layout { grid-template-columns:1fr; } .sidebar { position:static; } }
   </style>
 </head>
 <body>
 
 <nav class="navbar">
-  <a href="/" class="navbar-brand">🧵 Bordados <span>Personalizados</span></a>
+  <a href="/" class="navbar-brand">Bordados <span>Personalizados</span></a>
   <ul class="nav-links">
-    <li><a href="/">Catálogo</a></li>
+    <li><a href="/">Catalogo</a></li>
     <li><a href="/dashboard" class="active">Mi cuenta</a></li>
     <li><button class="btn btn-nav" onclick="Api.logout()">Salir</button></li>
   </ul>
@@ -60,23 +40,20 @@
 <div class="container">
   <div class="dashboard-layout">
 
-    <!-- Sidebar -->
     <aside class="sidebar">
       <div class="sidebar-user">
-        <div class="sidebar-avatar">🧑‍🎨</div>
-        <div class="sidebar-name" id="user-nombre">—</div>
-        <div class="sidebar-email" id="user-email">—</div>
+        <div class="sidebar-avatar">&#128100;</div>
+        <div class="sidebar-name" id="user-nombre">Cargando...</div>
+        <div class="sidebar-email" id="user-email"></div>
       </div>
       <nav class="sidebar-nav">
-        <div class="sidebar-link active" onclick="showTab('pedidos')">📦 Mis pedidos</div>
-        <div class="sidebar-link" onclick="showTab('perfil')">👤 Mi perfil</div>
-        <div class="sidebar-link" onclick="Api.logout()" style="margin-top:auto; color:#C0392B">🚪 Cerrar sesión</div>
+        <div class="sidebar-link active" onclick="showTab('pedidos', this)">Mis pedidos</div>
+        <div class="sidebar-link" onclick="showTab('perfil', this)">Mi perfil</div>
+        <div class="sidebar-link" onclick="Api.logout()" style="color:#C0392B">Cerrar sesion</div>
       </nav>
     </aside>
 
-    <!-- Contenido -->
     <main>
-      <!-- Tab: Pedidos -->
       <div class="tab-panel active" id="tab-pedidos">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem">
           <div>
@@ -85,41 +62,27 @@
           </div>
           <a href="/" class="btn btn-primary btn-sm">+ Nuevo pedido</a>
         </div>
-
         <div class="loading-state" id="pedidos-loading">
           <div class="spinner"></div>
           <p style="margin-top:1rem">Cargando pedidos...</p>
         </div>
-
         <div class="table-wrap" id="pedidos-table" style="display:none">
           <table>
             <thead>
-              <tr>
-                <th>#</th>
-                <th>Descripción</th>
-                <th>Talla</th>
-                <th>Color</th>
-                <th>Precio est.</th>
-                <th>Estado</th>
-                <th>Acción</th>
-              </tr>
+              <tr><th>#</th><th>Descripcion</th><th>Talla</th><th>Color</th><th>Precio est.</th><th>Estado</th><th>Accion</th></tr>
             </thead>
             <tbody id="pedidos-tbody"></tbody>
           </table>
         </div>
-
         <div class="empty-state" id="pedidos-empty" style="display:none">
-          <div class="empty-icon">📭</div>
-          <p>Aún no tienes pedidos.</p>
-          <a href="/" class="btn btn-primary" style="margin-top:1rem">Explorar catálogo</a>
+          <p>Aun no tienes pedidos.</p>
+          <a href="/" class="btn btn-primary" style="margin-top:1rem">Explorar catalogo</a>
         </div>
       </div>
 
-      <!-- Tab: Perfil -->
       <div class="tab-panel" id="tab-perfil">
         <h2 class="section-title" style="margin-bottom:0.25rem">Mi perfil</h2>
-        <p class="section-subtitle">Actualiza tu información personal</p>
-
+        <p class="section-subtitle">Actualiza tu informacion personal</p>
         <div class="card" style="max-width:480px; border-radius:var(--radius-lg)">
           <div class="card-body">
             <div class="alert alert-error" id="perfil-error"></div>
@@ -129,11 +92,11 @@
               <input type="text" id="p-nombre" />
             </div>
             <div class="form-group">
-              <label>Correo electrónico</label>
+              <label>Correo electronico</label>
               <input type="email" id="p-email" />
             </div>
             <div class="form-group">
-              <label>Dirección de envío</label>
+              <label>Direccion de envio</label>
               <input type="text" id="p-dir" />
             </div>
             <button class="btn btn-primary" onclick="guardarPerfil()">Guardar cambios</button>
@@ -141,6 +104,7 @@
         </div>
       </div>
     </main>
+
   </div>
 </div>
 
@@ -149,66 +113,51 @@
   requireAuth();
 
   const user = Api.getUser();
-  document.getElementById('user-nombre').textContent = user?.nombre || '—';
-  document.getElementById('user-email').textContent = user?.email || '—';
+  document.getElementById('user-nombre').textContent = user?.nombre || 'Usuario';
+  document.getElementById('user-email').textContent = user?.email || '';
 
-  function showTab(name) {
+  function showTab(name, el) {
     document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
     document.querySelectorAll('.sidebar-link').forEach(l => l.classList.remove('active'));
-    document.getElementById(`tab-${name}`).classList.add('active');
-    event.target.classList.add('active');
+    document.getElementById('tab-' + name).classList.add('active');
+    el.classList.add('active');
     if (name === 'pedidos') loadPedidos();
     if (name === 'perfil') loadPerfil();
   }
 
   function estadoBadge(estado) {
-    return `<span class="estado-badge estado-${estado}">${estado.replace('_', ' ')}</span>`;
+    return '<span class="estado-badge estado-' + estado + '">' + estado.replace('_', ' ') + '</span>';
   }
 
   async function loadPedidos() {
     document.getElementById('pedidos-loading').style.display = 'block';
     document.getElementById('pedidos-table').style.display = 'none';
     document.getElementById('pedidos-empty').style.display = 'none';
-
     try {
       const pedidos = await Api.getMisPedidos();
-      const tbody = document.getElementById('pedidos-tbody');
-
       if (!pedidos.length) {
         document.getElementById('pedidos-empty').style.display = 'block';
-        document.getElementById('pedidos-loading').style.display = 'none';
-        return;
+      } else {
+        document.getElementById('pedidos-tbody').innerHTML = pedidos.map(p => `
+          <tr>
+            <td><strong>#${p.id}</strong></td>
+            <td>${p.descripcion}</td>
+            <td>${p.talla || '-'}</td>
+            <td>${p.color || '-'}</td>
+            <td>${p.precio_estimado ? '$' + p.precio_estimado.toFixed(2) : 'Por definir'}</td>
+            <td>${estadoBadge(p.estado)}</td>
+            <td>${p.estado === 'pendiente' ? '<button class="btn btn-danger btn-sm" onclick="cancelar(' + p.id + ')">Cancelar</button>' : '-'}</td>
+          </tr>`).join('');
+        document.getElementById('pedidos-table').style.display = 'block';
       }
-
-      tbody.innerHTML = pedidos.map(p => `
-        <tr>
-          <td><strong>#${p.id}</strong></td>
-          <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${p.descripcion}">${p.descripcion}</td>
-          <td>${p.talla || '—'}</td>
-          <td>${p.color || '—'}</td>
-          <td>${p.precio_estimado ? '$' + p.precio_estimado.toFixed(2) : 'Por definir'}</td>
-          <td>${estadoBadge(p.estado)}</td>
-          <td>
-            ${p.estado === 'pendiente' 
-              ? `<button class="btn btn-danger btn-sm" onclick="cancelar(${p.id})">Cancelar</button>`
-              : '—'}
-          </td>
-        </tr>
-      `).join('');
-
-      document.getElementById('pedidos-loading').style.display = 'none';
-      document.getElementById('pedidos-table').style.display = 'block';
-    } catch (e) {
-      console.error(e);
-    }
+    } catch(e) { console.error(e); }
+    document.getElementById('pedidos-loading').style.display = 'none';
   }
 
   async function cancelar(id) {
-    if (!confirm('¿Cancelar este pedido?')) return;
-    try {
-      await Api.cancelPedido(id);
-      loadPedidos();
-    } catch (e) { alert(e.message); }
+    if (!confirm('Cancelar este pedido?')) return;
+    try { await Api.cancelPedido(id); loadPedidos(); }
+    catch(e) { alert(e.message); }
   }
 
   async function loadPerfil() {
@@ -217,26 +166,22 @@
       document.getElementById('p-nombre').value = me.nombre_real || '';
       document.getElementById('p-email').value = me.email || '';
       document.getElementById('p-dir').value = me.direccion_envio || '';
-    } catch (e) { console.error(e); }
+    } catch(e) { console.error(e); }
   }
 
   async function guardarPerfil() {
     const errEl = document.getElementById('perfil-error');
-    const okEl  = document.getElementById('perfil-ok');
-    errEl.classList.remove('show');
-    okEl.classList.remove('show');
+    const okEl = document.getElementById('perfil-ok');
+    errEl.classList.remove('show'); okEl.classList.remove('show');
     try {
       await Api.updateMe({
         nombre_real: document.getElementById('p-nombre').value,
         email: document.getElementById('p-email').value,
         direccion_envio: document.getElementById('p-dir').value,
       });
-      okEl.textContent = '¡Perfil actualizado!';
+      okEl.textContent = 'Perfil actualizado!';
       okEl.classList.add('show');
-    } catch (e) {
-      errEl.textContent = e.message;
-      errEl.classList.add('show');
-    }
+    } catch(e) { errEl.textContent = e.message; errEl.classList.add('show'); }
   }
 
   loadPedidos();
