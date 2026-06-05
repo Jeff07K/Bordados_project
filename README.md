@@ -1,4 +1,5 @@
-# 🧵 Bordados Personalizados — v 0.2.0
+# 🧵 Bordados Personalizados — v 0.2.0 
+solo funciona en local por ahora 
 
 Tienda online de bordados pedidos personalizados.
 
